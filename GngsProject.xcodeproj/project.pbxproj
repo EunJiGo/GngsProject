@@ -13,6 +13,12 @@
 		E03BAEA9292740FA009D9C08 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E03BAEA7292740FA009D9C08 /* Main.storyboard */; };
 		E03BAEAB292740FB009D9C08 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E03BAEAA292740FB009D9C08 /* Assets.xcassets */; };
 		E03BAEAE292740FB009D9C08 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E03BAEAC292740FB009D9C08 /* LaunchScreen.storyboard */; };
+		E03BAEB7292742CD009D9C08 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = E03BAEB6292742CD009D9C08 /* libsqlite3.tbd */; };
+		E03BAEBB292744EA009D9C08 /* DBInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E03BAEBA292744EA009D9C08 /* DBInfo.swift */; };
+		E05F9B15292B1CD400C3FAA1 /* ListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05F9B14292B1CD400C3FAA1 /* ListViewController.swift */; };
+		E0BE86A8292B7D820039A1A7 /* gngsLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = E0BE86A7292B7D820039A1A7 /* gngsLogo.png */; };
+		E0BE86AA292C63330039A1A7 /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BE86A9292C63330039A1A7 /* TestViewController.swift */; };
+		E0BE86AD292C94B20039A1A7 /* UpdateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BE86AC292C94B20039A1A7 /* UpdateViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +30,13 @@
 		E03BAEAA292740FB009D9C08 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E03BAEAD292740FB009D9C08 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E03BAEAF292740FB009D9C08 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E03BAEB6292742CD009D9C08 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
+		E03BAEB829274335009D9C08 /* GngsProject-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GngsProject-Bridging-Header.h"; sourceTree = "<group>"; };
+		E03BAEBA292744EA009D9C08 /* DBInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBInfo.swift; sourceTree = "<group>"; };
+		E05F9B14292B1CD400C3FAA1 /* ListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListViewController.swift; sourceTree = "<group>"; };
+		E0BE86A7292B7D820039A1A7 /* gngsLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = gngsLogo.png; path = ../../../../gngsLogo.png; sourceTree = "<group>"; };
+		E0BE86A9292C63330039A1A7 /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
+		E0BE86AC292C94B20039A1A7 /* UpdateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,6 +44,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E03BAEB7292742CD009D9C08 /* libsqlite3.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -40,8 +54,10 @@
 		E03BAE95292740FA009D9C08 = {
 			isa = PBXGroup;
 			children = (
+				E03BAEB829274335009D9C08 /* GngsProject-Bridging-Header.h */,
 				E03BAEA0292740FA009D9C08 /* GngsProject */,
 				E03BAE9F292740FA009D9C08 /* Products */,
+				E03BAEB5292742CD009D9C08 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -56,15 +72,60 @@
 		E03BAEA0292740FA009D9C08 /* GngsProject */ = {
 			isa = PBXGroup;
 			children = (
+				E0BE86AB292C94820039A1A7 /* 修正画面 */,
+				E05F9B11292B0E0700C3FAA1 /* List */,
+				E03BAEBC29275327009D9C08 /* Login */,
+				E03BAEB92927449B009D9C08 /* DB */,
 				E03BAEA1292740FA009D9C08 /* AppDelegate.swift */,
 				E03BAEA3292740FA009D9C08 /* SceneDelegate.swift */,
-				E03BAEA5292740FA009D9C08 /* ViewController.swift */,
 				E03BAEA7292740FA009D9C08 /* Main.storyboard */,
+				E0BE86A9292C63330039A1A7 /* TestViewController.swift */,
 				E03BAEAA292740FB009D9C08 /* Assets.xcassets */,
 				E03BAEAC292740FB009D9C08 /* LaunchScreen.storyboard */,
 				E03BAEAF292740FB009D9C08 /* Info.plist */,
 			);
 			path = GngsProject;
+			sourceTree = "<group>";
+		};
+		E03BAEB5292742CD009D9C08 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E03BAEB6292742CD009D9C08 /* libsqlite3.tbd */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E03BAEB92927449B009D9C08 /* DB */ = {
+			isa = PBXGroup;
+			children = (
+				E03BAEBA292744EA009D9C08 /* DBInfo.swift */,
+			);
+			path = DB;
+			sourceTree = "<group>";
+		};
+		E03BAEBC29275327009D9C08 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				E0BE86A7292B7D820039A1A7 /* gngsLogo.png */,
+				E03BAEA5292740FA009D9C08 /* ViewController.swift */,
+			);
+			path = Login;
+			sourceTree = "<group>";
+		};
+		E05F9B11292B0E0700C3FAA1 /* List */ = {
+			isa = PBXGroup;
+			children = (
+				E05F9B14292B1CD400C3FAA1 /* ListViewController.swift */,
+			);
+			path = List;
+			sourceTree = "<group>";
+		};
+		E0BE86AB292C94820039A1A7 /* 修正画面 */ = {
+			isa = PBXGroup;
+			children = (
+				E0BE86AC292C94B20039A1A7 /* UpdateViewController.swift */,
+			);
+			path = "修正画面";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -128,6 +189,7 @@
 				E03BAEAE292740FB009D9C08 /* LaunchScreen.storyboard in Resources */,
 				E03BAEAB292740FB009D9C08 /* Assets.xcassets in Resources */,
 				E03BAEA9292740FA009D9C08 /* Main.storyboard in Resources */,
+				E0BE86A8292B7D820039A1A7 /* gngsLogo.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -139,7 +201,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				E03BAEA6292740FA009D9C08 /* ViewController.swift in Sources */,
+				E03BAEBB292744EA009D9C08 /* DBInfo.swift in Sources */,
 				E03BAEA2292740FA009D9C08 /* AppDelegate.swift in Sources */,
+				E05F9B15292B1CD400C3FAA1 /* ListViewController.swift in Sources */,
+				E0BE86AA292C63330039A1A7 /* TestViewController.swift in Sources */,
+				E0BE86AD292C94B20039A1A7 /* UpdateViewController.swift in Sources */,
 				E03BAEA4292740FA009D9C08 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -302,6 +368,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners.GngsProject";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "GngsProject-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -329,6 +396,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners.GngsProject";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "GngsProject-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
