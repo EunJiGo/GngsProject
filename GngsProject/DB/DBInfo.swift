@@ -371,56 +371,33 @@ class DBInfo {
         return loginList
     }
     
-    func get(id: String) -> String {
-//        let empList = self.find()
-        var stmt: OpaquePointer? = nil // 컴파일된 SQL을 담을 객체
-        // 1. 질의 실행
-        let sql = "SELECT * FROM login_tbl WHERE EMPLOYEE_ID = '\(id)'"
-        if sqlite3_prepare(db, sql, -1, &stmt, nil) != SQLITE_OK {
+    
+    func loginInfoGet(id: String) -> LoginVO {
+        let loginInfo = LoginVO()
+        var stmt: OpaquePointer? = nil
+        let query = "SELECT * FROM login_tbl WHERE EMPLOYEE_ID = '\(id)'"
+        if sqlite3_prepare(db, query, -1, &stmt, nil) != SQLITE_OK {
             let err = String(cString: sqlite3_errmsg(db))
+            print("loginInfo Method Fail")
             print(err)
-            print("Prepatre Statement Fail")
         }else {
-            print("get() 아이디에 대한 login정보 다 select 성공")
-            
+            print("loginInfo Method Success")
         }
         if sqlite3_step(stmt) == SQLITE_ROW {
-            let employeeID = String(cString: sqlite3_column_text(stmt, 1))
-            print("get() 아이디만 가지고 옴 - viewController에서 데베에 아이디 유무 체크")
+            loginInfo.employeeNum = String(cString: sqlite3_column_text(stmt, 0))
+            loginInfo.employeeEmail = String(cString: sqlite3_column_text(stmt, 1))
+            loginInfo.employeePw = String(cString: sqlite3_column_text(stmt, 2))
+            print(loginInfo.employeeNum)
+            print(loginInfo.employeeEmail)
             sqlite3_finalize(stmt)
-            return employeeID
+            return loginInfo
         } else {
             sqlite3_finalize(stmt)
-            return "fail"
+            return loginInfo
         }
     }
     
-    func pwExist(pw: String) -> String{
-        var stmt: OpaquePointer? = nil // 컴파일된 SQL을 담을 객체
-        let sql = "SELECT * FROM login_tbl WHERE EMPLOYEE_PW = '\(pw)'"
-        if sqlite3_prepare(db, sql, -1, &stmt, nil) != SQLITE_OK {
-            print("insert fail")
-            let err = String(cString: sqlite3_errmsg(db))
-            print(err)
-        }else {
-            print("pwExist()")
-        }
-        
-        
-        if sqlite3_step(stmt) == SQLITE_ROW {
-            let employeePW = String(cString: sqlite3_column_text(stmt, 2))
-            print("pwExist() 패스워드까지 확인 완료")
-            sqlite3_finalize(stmt)
-            return employeePW
-        } else {
-            let err = String(cString: sqlite3_errmsg(db))
-            print(err)
-            sqlite3_finalize(stmt)
-            return "fail"
-        }
-        
-    }
-    
+   
     typealias empRecord = (String, String, String, String)
     func empList() -> [empRecord] {
 //        createTable()

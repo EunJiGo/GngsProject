@@ -17,7 +17,15 @@ class TestViewController: UIViewController, UIScrollViewDelegate{
         }
     }
 
-    @IBOutlet var button: UIBarButtonItem!
+    @IBOutlet weak var button: UIBarButtonItem!
+    
+    @IBAction func button(_ sender: Any) {
+        guard let uvc = self.storyboard?.instantiateViewController(withIdentifier: "Detail") else {
+            return
+        }
+        self.navigationController?.pushViewController(uvc, animated: true)
+        
+    }
     @IBOutlet var scroll: UIScrollView!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,10 +34,8 @@ class TestViewController: UIViewController, UIScrollViewDelegate{
 
 
     @IBOutlet weak var nav: UINavigationItem!
-
     
     @IBOutlet weak var stackView: UIStackView!
-    
     
     @IBOutlet var scrollView: UIScrollView!
     

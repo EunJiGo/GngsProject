@@ -9,9 +9,10 @@ import UIKit
 
 class ListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
+    let dbInfo = DBInfo()
     @IBOutlet weak var myTableView: UITableView!
     @IBOutlet weak var listTB: UITabBarItem!
-    let dbInfo = DBInfo()
+    
     var employeeList: [(empNum: String, empKanzi: String, empPosition: String, empTeam: String)]!
     
     override func viewDidLoad() {
@@ -39,17 +40,6 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         return cell!
     }
-    
-//    var cellIndexNum: Int = 0
-//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath){
-////        let indexPath = IndexPath(row:0 , section: 0)
-////            let cell = tableView.cellForRow(at: indexPath)
-////        print(cell)
-////        var empNum = cell!.viewWithTag(1)
-//        print("2")
-//
-//        cellIndexNum = indexPath.row
-//    }
     
     typealias empDetailRecord = (String, String, String, String, String, Int, String, String, String, Int, String)
     var empDetailList = [empDetailRecord]()

@@ -8,7 +8,7 @@
 import UIKit
 
 class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
-
+    
     typealias empDetailRecord = (String, String, String, String, String, Int, String, String, String, Int, String)
     var empDetailList = [empDetailRecord]()
     var idxNum: Int = 0
@@ -17,7 +17,6 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
     let dbInfo = DBInfo()
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         let singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(MyTapMethod))
         singleTapGestureRecognizer.numberOfTapsRequired = 1
         singleTapGestureRecognizer.isEnabled = true
@@ -218,6 +217,7 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
         return true
     }
     
+    let alertMessage = AlertViewController()
     @IBAction func updateBtn(_ sender: Any) {
         // MARK: - 名前（漢字）
         // 1) is empry?, count
@@ -237,7 +237,7 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
         // MARK: - ...
         
         if self.nameKjTF.text == empDetailList[idxNum].1 && self.nameKtTF.text == empDetailList[idxNum].2 && self.nameEngTF.text == empDetailList[idxNum].3 && self.firstTel.text == firstNum && self.secondTel.text == secondNum && self.lastTel.text == lastNum && self.positionTF.text == empDetailList[idxNum].6 && self.teamTF.text == empDetailList[idxNum].7 && self.megazineValue == empDetailList[idxNum].9 &&  self.memoTV.text == empDetailList[idxNum].10 {
-            wrongCaseAlert(title: "", message: "修正事項がありません。")
+            alertMessage.wrongCaseAlert(title: "", message: "修正事項がありません。", target: self)
         } else{
             let kanjiPattern = "^[一-龠]*$"
             let kataPattern = "^[ァ-ヶー]*$"
@@ -266,36 +266,37 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
                                         uvc.modalPresentationStyle = .fullScreen
                                         self.present(uvc, animated: true)
                                     } else {
-                                        wrongCaseAlert(title: "", message: "正しい英語形式ではありません。")
+                                        alertMessage.wrongCaseAlert(title: "", message: "正しい英語形式ではありません。", target: self)
                                     }
                                 } else {
-                                    wrongCaseAlert(title: "", message: "正しいカタカナ形式ではありません。")
+                                    alertMessage.wrongCaseAlert(title: "", message: "正しいカタカナ形式ではありません。", target: self)
                                 }
                             }else {
-                                wrongCaseAlert(title: "", message: "正しい漢字形式ではありません。")
+                                alertMessage.wrongCaseAlert(title: "", message: "正しい漢字形式ではありません。", target: self )
                             }
                         } else {
-                            wrongCaseAlert(title: "", message: "電話番号を入力してください")
+                            alertMessage.wrongCaseAlert(title: "", message: "電話番号を入力してください", target: self)
                         }
                     } else {
-                        wrongCaseAlert(title: "", message: "名前(英語)を入力してください")
+                        alertMessage.wrongCaseAlert(title: "", message: "名前(英語)を入力してください", target: self)
                     }
                 }else {
-                    wrongCaseAlert(title: "", message: "名前(カナ)を入力してください")
+                    alertMessage.wrongCaseAlert(title: "", message: "名前(カナ)を入力してください", target: self)
                 }
                 
             } else {
-                wrongCaseAlert(title: "", message: "名前(漢字)を入力してください")
+                alertMessage.wrongCaseAlert(title: "", message: "名前(漢字)を入力してください", target: self)
             }
         }
     }
     
-    func wrongCaseAlert(title: String, message: String) {
-            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-            let check = UIAlertAction(title: "OK", style: UIAlertAction.Style.cancel)
-            alert.addAction(check)
-            self.present(alert, animated: false)
-    }
+    
+//    func wrongCaseAlert(title: String, message: String) {
+//            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+//            let check = UIAlertAction(title: "OK", style: UIAlertAction.Style.cancel)
+//            alert.addAction(check)
+//            self.present(alert, animated: false)
+//    }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == self.nameKjTF || textField == self.nameKtTF || textField == self.nameEngTF || textField == self.firstTel || textField == self.secondTel || textField == self.lastTel {
