@@ -33,9 +33,11 @@ class ViewController: UIViewController {
                 alert.addAction(check)
                 self.present(alert, animated: false)
             } else {
-                if id.text == dbInfo.get(id: id.text!) {
+                var empId = dbInfo.get(id: id.text!)
+                if id.text == empId {
                     if pw.text == dbInfo.pwExist(pw: pw.text!) {
                         print("일람 화면으로 이동 sqlite3_close(db) ")
+                        dbInfo.lastLoginUpdate(id: empId)
                         self.performSegue(withIdentifier: "Login", sender: self)
                     } else {
                         let alert = UIAlertController(title: "", message: "パスワードが間違っています。 もう一度入力してください。", preferredStyle: .alert)
@@ -64,6 +66,10 @@ class ViewController: UIViewController {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.view.endEditing(true)
     }
-
+    
+    
+    
+    @IBAction func positionTouch(_ sender: Any) {
+    }
 }
 

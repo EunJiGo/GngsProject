@@ -16,13 +16,7 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
     var megazineValue: Int = 0
     let dbInfo = DBInfo()
     override func viewDidLoad() {
-//        pickerView1.transform = CGAffineTransform(scaleX: 0.9, y: 0.8);
-        
-//        pickerView1.frame = CGRect(x: 0, y: 0, width: 320, height: 250);
-//        pickerView2.frame = CGRect(x: 0, y: 0, width: 320, height: 250);
         super.viewDidLoad()
-        
-          
         
         let singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(MyTapMethod))
         singleTapGestureRecognizer.numberOfTapsRequired = 1
@@ -65,12 +59,8 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
         
         createPickerView()
         
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-        
-        
-
+        addKeyboardNotifications()
+        removeKeyboardNotifications()
     }
     
     @IBOutlet weak var myScrollView: UIScrollView!
@@ -113,7 +103,6 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
 
     let position = ["社員", "主任", "課長", "次長", "部長", "代表"]
     let team = ["第1チーム", "第2チーム", "第3チーム", "第4チーム"]
-    var height: CGFloat = 150
     var pickerView1 = UIPickerView()
     let pickerView2 = UIPickerView()
     func createPickerView() {
@@ -124,26 +113,8 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
         pickerView2.dataSource = self
         teamTF.tintColor = .clear
     
-        
-        
         let toolBar = UIToolbar()
         toolBar.sizeToFit()
-        
-        let pv1View = pickerView1
-        var frameV1 = pv1View.frame
-        frameV1.size.height = 257
-        pv1View.frame = frameV1
-        positionTF.inputView = pv1View
-        let pv2View = pickerView2
-        var frameV2 = pv1View.frame
-        frameV2.size.height = 257
-        pv2View.frame = frameV2
-        positionTF.inputView = pv2View
-        
-        
-        
-        
-//        let toolBar = UIToolbar(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 120))
         
         let btnDone = UIBarButtonItem(title: "決定", style: .done, target: self, action: #selector(onPickDone))
         let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
@@ -155,18 +126,7 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
         teamTF.inputView = pickerView2
         positionTF.inputAccessoryView = toolBar
         teamTF.inputAccessoryView = toolBar
-//        positionBtn.addSubview(pickerView)
     }
-    
-    
-
-    //피커 뷰가 선택되었을 때 실행
-//        func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIPickerView {
-//
-//            pickerView1.frame = CGRect(x: 0, y: 0, width: 320, height: 3000;
-//            pickerView2.frame = CGRect(x: 0, y: 0, width: 320, height: 220);
-//            return pickerView1
-//        }
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
@@ -187,11 +147,9 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
             return team[row]
         }
     }
-    
     var positionValue: String = ""
     var teamValue: String = ""
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-//        pickerView1.frame = CGRect(x: 0, y: 0, width: 320, height: 270);
         if pickerView == pickerView1{
             positionValue = position[row]
             teamValue = self.teamTF.text!
@@ -278,10 +236,6 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
         
         // MARK: - ...
         
-        
-
-        
-        
         if self.nameKjTF.text == empDetailList[idxNum].1 && self.nameKtTF.text == empDetailList[idxNum].2 && self.nameEngTF.text == empDetailList[idxNum].3 && self.firstTel.text == firstNum && self.secondTel.text == secondNum && self.lastTel.text == lastNum && self.positionTF.text == empDetailList[idxNum].6 && self.teamTF.text == empDetailList[idxNum].7 && self.megazineValue == empDetailList[idxNum].9 &&  self.memoTV.text == empDetailList[idxNum].10 {
             wrongCaseAlert(title: "", message: "修正事項がありません。")
         } else{
@@ -359,56 +313,54 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
         }
     //ダメ。。 왜 안돼..
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView){
-            self.view.endEditing(true)
+            self.myScrollView.endEditing(true)
     }
     
     
     // 노티피케이션을 추가하는 메서드
     func addKeyboardNotifications(){
         // 키보드가 나타날 때 앱에게 알리는 메서드 추가
-        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification , object: nil)
-        // 키보드가 사라질 때 앱에게 알리는 메서드 추가
-        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
     }
 
     // 노티피케이션을 제거하는 메서드
     func removeKeyboardNotifications(){
         // 키보드가 나타날 때 앱에게 알리는 메서드 제거
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification , object: nil)
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
+    
+    @IBOutlet weak var stack: UIStackView!
     
     // 키보드가 나타났다는 알림을 받으면 실행할 메서드
     @objc func keyboardWillShow(_ noti: NSNotification){
-        // 키보드의 높이만큼 화면을 올려준다.
-        if let keyboardSize = (noti.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-            if self.view.frame.origin.y == 0 {
-//                self.view.frame.origin.y -= keyboardSize.height
-            //scrollViewの大きさを設定。
-            myScrollView.frame = self.view.frame
-
-            //スクロール領域の設定
-            myScrollView.contentSize = CGSize(width:0, height:1280)
-            //scrollViewをviewのSubViewとして追加
-            self.view.addSubview(myScrollView)
-            }
+        let userInfo = noti.userInfo
+        let keyboardFrame = (userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as! NSValue).cgRectValue.height
+        self.myScrollView.contentSize = CGSize(
+            width: self.myScrollView.frame.width,
+            height: 1280
+        )
+        
+        if self.memoTV.isFirstResponder {
+            let y = self.stack.frame.height - self.myScrollView.frame.height + (-20) + keyboardFrame
+            self.myScrollView.contentOffset = CGPoint(x: 0, y: y)
+        }
+        
+        if self.positionTF.isFirstResponder {
+            let y = self.stack.frame.height - self.myScrollView.frame.height + (-300) + keyboardFrame
+            self.myScrollView.contentOffset = CGPoint(x: 0, y: y)
+        }
+        
+        if self.teamTF.isFirstResponder {
+            let y = self.stack.frame.height - self.myScrollView.frame.height + (-300) + keyboardFrame
+            self.myScrollView.contentOffset = CGPoint(x: 0, y: y)
         }
     }
-
 
     // 키보드가 사라졌다는 알림을 받으면 실행할 메서드
     @objc func keyboardWillHide(_ noti: NSNotification){
         myScrollView.frame = self.view.frame
-
-        //スクロール領域の設定
         myScrollView.contentSize = CGSize(width:0, height:1000)
-        //scrollViewをviewのSubViewとして追加
-        self.view.addSubview(myScrollView)
-        // 키보드의 높이만큼 화면을 내려준다.
-//        if self.view.frame.origin.y != 0 {
-//            self.myScrollView.frame.origin.y = 0
-//        }
+        self.myScrollView.contentOffset = CGPoint(x: 0, y: 150)
+
     }
-    
-    
 }

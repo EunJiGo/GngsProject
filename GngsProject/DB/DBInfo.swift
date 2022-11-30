@@ -15,6 +15,7 @@ class DBInfo {
         let dbPath = self.getDBPath()
         print(dbPath)
         self.openDB(dbPath: dbPath)
+        team()
     }
     
     deinit {
@@ -93,66 +94,100 @@ class DBInfo {
         }
     }
     
+    var empVo = EmployeeVO()
+    func csvInsert() {
+        var csvLines = [String]()
+        var empList = [EmployeeVO]()
+        guard let path = Bundle.main.path(forResource:"dataList2", ofType:"csv") else {
+            print("csvファイルがないよ")
+            return
+        }
+
+        do {
+            let csvString = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
+            csvLines = csvString.replacingOccurrences(of: "\r\n", with: "\n").replacingOccurrences(of: "\r", with: "\n").components(separatedBy: .newlines)
+            csvLines.removeLast()
+        } catch let error as NSError {
+            print("エラー: \(error)")
+            return
+        }
+        
+        for data in csvLines {
+            let empDetail = data.components(separatedBy: ",")
+            empVo.employeeNum = empDetail[0]
+            empVo.employeeEmail = empDetail[1]
+            empVo.employeePw = empDetail[2]
+            empVo.employeeKj = empDetail[3]
+            empVo.employeeKt = empDetail[4]
+            empVo.employeeEng = empDetail[5]
+            empVo.employeeTel = empDetail[6]
+            let empGender = Int(empDetail[7])!
+            empVo.gender = empGender
+            empVo.position = empDetail[8]
+            empVo.team = empDetail[9]
+            empVo.registerDate = empDetail[10]
+            empList.append(empVo)
+            
+            csvEmpInput(employeeNum: empDetail[0], employeeKj: empDetail[3], employeeKt: empDetail[4], employeeEng: empDetail[5], employeeTel: empDetail[6], gender: empGender, position: empDetail[8], team: empDetail[9], registerDate: empDetail[10])
+            
+            csvLoginInput(employeeNum: empDetail[0], employeeEmail: empDetail[1], employeePw: empDetail[2])
+        }
+    }
     
-    func employeeNum()->String{
-        var formatter = DateFormatter()
-        formatter.dateFormat = "yy"
-        var current_year_string = formatter.string(from: Date())
-        print(current_year_string)
-        
-        formatter.dateFormat = "MM"
-        var current_month_string = formatter.string(from: Date())
-        print(current_month_string)
-        
-        formatter.dateFormat = "dd"
-        var current_date_string = formatter.string(from: Date())
-        print(current_date_string)
-        
-        var stmt: OpaquePointer? = nil // 컴파일된 SQL을 담을 객체
-        let query = "SELECT COUNT(*) FROM employee_tbl"
-    //employeeNum: String, employeeId: String, employeePw: String, LastLogin: String
-        
+    func csvEmpInput(employeeNum: String, employeeKj: String, employeeKt: String, employeeEng: String, employeeTel: String, gender: Int, position: String, team: String, registerDate: String ) {
+        var stmt: OpaquePointer?
+        let query = "INSERT INTO employee_tbl (EMPLOYEE_NUM, NAME_KANJI, NAME_KANA, NAME_ENG, TEL, GENDER, POSITION, TEAM, MEGAZINE) VALUES ('\(employeeNum)', '\(employeeKj)', '\(employeeKt)', '\(employeeEng)', '\(employeeTel)', \(gender), '\(position)', '\(team)', '\(registerDate)')"
+       
         if sqlite3_prepare(db, query, -1, &stmt, nil) != SQLITE_OK {
+            print("insert fail")
             let err = String(cString: sqlite3_errmsg(db))
             print(err)
-            print("emPrepare Statement Fail")
         }else {
-            print("emprepare")
+            print("insert success")
         }
-        if sqlite3_step(stmt) != SQLITE_ROW {
-            print("emsel ffail")
+        if sqlite3_step(stmt) != SQLITE_DONE {
+            print("insert ffail")
         }else {
-            print("emsel ssucess")
-            
-        }
-        let empCount = sqlite3_column_int(stmt, 0)
-        print("확인")
-        print(empCount)
-        var rs: String = ""
-        if empCount >= 0 && empCount <= 8 {
-            let empCD = empCount+1
-            rs = "000\(empCD)"
-            
-        } else if empCount >= 9 && empCount <= 98 {
-            let empCD = empCount+1
-            rs = "00\(empCD)"
-        } else if empCount >= 99 && empCount <= 998 {
-            let empCD = empCount+1
-            rs = "0\(empCD)"
-        } else if empCount >= 999 && empCount <= 9998 {
-            let empCD = empCount+1
-            rs = "\(empCD)"
-        } else {
-            print("Error")
+            print("insert ssucess")
         }
         
-        print("rs")
-        print(rs)
-        
-        let employeeCD = "\(current_year_string)-\(current_month_string)\(current_date_string)\(rs)"
-        print(employeeCD)
         sqlite3_finalize(stmt)
-        return employeeCD
+    }
+        
+    func csvLoginInput(employeeNum: String, employeeEmail: String, employeePw: String) {
+        var stmt: OpaquePointer?
+        let query = "INSERT INTO login_tbl (EMPLOYEE_NUM, EMPLOYEE_ID, EMPLOYEE_PW) VALUES ('\(employeeNum)', '\(employeeEmail)', '\(employeePw)')"
+           
+        if sqlite3_prepare(db, query, -1, &stmt, nil) != SQLITE_OK {
+            print("insert fail")
+            let err = String(cString: sqlite3_errmsg(db))
+            print(err)
+        }else {
+            print("insert success")
+        }
+        if sqlite3_step(stmt) != SQLITE_DONE {
+            print("insert ffail")
+        }else {
+            print("insert ssucess")
+        }
+        sqlite3_finalize(stmt)
+    }
+    
+    func lastLoginUpdate(id: String) {
+        var stmt: OpaquePointer? = nil
+        var formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        var current_date_string = formatter.string(from: Date())
+        let sql = "UPDATE login_tbl SET LAST_LOGIN = '\(current_date_string)' WHERE EMPLOYEE_ID= '\(id)'"
+        if sqlite3_prepare(db, sql, -1, &stmt, nil) != SQLITE_OK{
+            let errmsg = String(cString: sqlite3_errmsg(db)!)
+            print("error preparing insert: \(errmsg)")
+        }
+        if sqlite3_step(stmt) != SQLITE_DONE {
+            let errmsg = String(cString: sqlite3_errmsg(db)!)
+            print("failure inserting hero111: \(errmsg)")
+            sqlite3_finalize(stmt)
+        }
     }
     
     func LoginInfoInsert() -> Bool {
@@ -182,6 +217,38 @@ class DBInfo {
         return true
     }
     
+    func team() {
+        var stmt: OpaquePointer?
+        let query = "INSERT INTO team_tbl (TEAM_CODE, TEAM_NAME) VALUES ('O1', '第1チーム'), ('O2', '第2チーム'), ('O3', '第3チーム'), ('O4', '第4チーム')"
+        if sqlite3_prepare(db, query, -1, &stmt, nil) != SQLITE_OK {
+            let err = String(cString: sqlite3_errmsg(db))
+            print(err)
+        }else {
+            
+        }
+        if sqlite3_step(stmt) != SQLITE_DONE {
+            print("team Insert Fail")
+        } else {
+            print("team Insert Ok")
+        }
+    }
+    
+    func position() {
+        var stmt: OpaquePointer?
+        let query = "INSERT INTO position_tbl (POSITION_CODE, POSITION_NAME) VALUES ('O6', '社長')"
+        if sqlite3_prepare(db, query, -1, &stmt, nil) != SQLITE_OK {
+            let err = String(cString: sqlite3_errmsg(db))
+            print(err)
+        } else {
+        }
+        if sqlite3_step(stmt) != SQLITE_DONE {
+            print("position insert Fail")
+        } else {
+            print("position insert OK")
+        }
+        sqlite3_finalize(stmt)
+    }
+    
     func employeeInfoInsert() -> Bool {
         var stmt: OpaquePointer?
         let employee_num: String = self.employeeNum()
@@ -207,6 +274,67 @@ class DBInfo {
         sqlite3_finalize(stmt)
         return true
     }
+        
+        func employeeNum() -> String{
+            var formatter = DateFormatter()
+            formatter.dateFormat = "yy"
+            var current_year_string = formatter.string(from: Date())
+            print(current_year_string)
+            
+            formatter.dateFormat = "MM"
+            var current_month_string = formatter.string(from: Date())
+            print(current_month_string)
+            
+            formatter.dateFormat = "dd"
+            var current_date_string = formatter.string(from: Date())
+            print(current_date_string)
+            
+            var stmt: OpaquePointer? = nil // 컴파일된 SQL을 담을 객체
+            let query = "SELECT COUNT(*) FROM employee_tbl"
+        //employeeNum: String, employeeId: String, employeePw: String, LastLogin: String
+            
+            if sqlite3_prepare(db, query, -1, &stmt, nil) != SQLITE_OK {
+                let err = String(cString: sqlite3_errmsg(db))
+                print(err)
+                print("emPrepare Statement Fail")
+            }else {
+                print("emprepare")
+            }
+            if sqlite3_step(stmt) != SQLITE_ROW {
+                print("emsel ffail")
+            }else {
+                print("emsel ssucess")
+                
+            }
+            let empCount = sqlite3_column_int(stmt, 0)
+            print("확인")
+            print(empCount)
+            var rs: String = ""
+            if empCount >= 0 && empCount <= 8 {
+                let empCD = empCount+1
+                rs = "000\(empCD)"
+                
+            } else if empCount >= 9 && empCount <= 98 {
+                let empCD = empCount+1
+                rs = "00\(empCD)"
+            } else if empCount >= 99 && empCount <= 998 {
+                let empCD = empCount+1
+                rs = "0\(empCD)"
+            } else if empCount >= 999 && empCount <= 9998 {
+                let empCD = empCount+1
+                rs = "\(empCD)"
+            } else {
+                print("Error")
+            }
+            
+            print("rs")
+            print(rs)
+            
+            let employeeCD = "\(current_year_string)-\(current_month_string)\(current_date_string)\(rs)"
+            print(employeeCD)
+            sqlite3_finalize(stmt)
+            return employeeCD
+        }
     
     
     typealias LoginRecord = (String, String, String, String)
@@ -314,8 +442,8 @@ class DBInfo {
         while sqlite3_step(stmt) == SQLITE_ROW {
             let empNum = String(cString: sqlite3_column_text(stmt, 0))
             let empKanji = String(cString: sqlite3_column_text(stmt, 1))
-            let empPosition = String(cString: sqlite3_column_text(stmt, 6))
-            let empTeam = String(cString: sqlite3_column_text(stmt, 7))
+            let empPosition = positionChange(ps: String(cString: sqlite3_column_text(stmt, 6)))
+            let empTeam = teamChange(team: String(cString: sqlite3_column_text(stmt, 7)))
             empList.append((empNum, empKanji, empPosition, empTeam))
         }
         sqlite3_finalize(stmt)
@@ -347,8 +475,8 @@ class DBInfo {
             let empEng = String(cString: sqlite3_column_text(stmt, 3))
             let tel = String(cString: sqlite3_column_text(stmt, 4))
             let gender: Int = Int(sqlite3_column_int(stmt, 5))
-            let empPosition = String(cString: sqlite3_column_text(stmt, 6))
-            let empTeam = String(cString: sqlite3_column_text(stmt, 7))
+            let empPosition = positionChange(ps: String(cString: sqlite3_column_text(stmt, 6)))
+            let empTeam = teamChange(team: String(cString: sqlite3_column_text(stmt, 7)))
             let megazine: Int = Int(sqlite3_column_int(stmt, 9))
             let RegDate: String
             if sqlite3_column_text(stmt, 11) != nil {
@@ -369,6 +497,44 @@ class DBInfo {
         sqlite3_finalize(stmt)
        //sqlite3_close(db)
         return empDetailList
+    }
+    
+    func positionChange(ps: String)->String{
+        if ps == "01" {
+            return "社員"
+        }
+        if ps == "02" {
+            return "主任"
+        }
+        if ps == "03" {
+            return "課長"
+        }
+        if ps == "04" {
+            return "次長"
+        }
+        if ps == "05" {
+            return "部長"
+        }
+        if ps == "06" {
+            return "代表"
+        }
+        return ps //change
+    }
+    
+    func teamChange(team: String)->String{
+        if team == "01" {
+            return "第1チーム"
+        }
+        if team == "02" {
+            return "第2チーム"
+        }
+        if team == "03" {
+            return "第3チーム"
+        }
+        if team == "04" {
+            return "第4チーム"
+        }
+        return team //change
     }
     
     func update(nameKj: String, nameKn: String, nameEng: String, tel: String, position: String, team: String, megazine: Int, memo: String, empNum: String) {

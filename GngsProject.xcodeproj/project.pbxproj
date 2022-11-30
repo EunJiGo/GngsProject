@@ -19,6 +19,8 @@
 		E0BE86A8292B7D820039A1A7 /* gngsLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = E0BE86A7292B7D820039A1A7 /* gngsLogo.png */; };
 		E0BE86AA292C63330039A1A7 /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BE86A9292C63330039A1A7 /* TestViewController.swift */; };
 		E0BE86AD292C94B20039A1A7 /* UpdateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BE86AC292C94B20039A1A7 /* UpdateViewController.swift */; };
+		E0FADA8B2935E1CD002D6C6B /* EmployeeVO.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0FADA8A2935E1CD002D6C6B /* EmployeeVO.swift */; };
+		E0FADA8F2935F037002D6C6B /* dataList2.csv in Resources */ = {isa = PBXBuildFile; fileRef = E0FADA8E2935F037002D6C6B /* dataList2.csv */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +39,8 @@
 		E0BE86A7292B7D820039A1A7 /* gngsLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = gngsLogo.png; path = ../../../../gngsLogo.png; sourceTree = "<group>"; };
 		E0BE86A9292C63330039A1A7 /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
 		E0BE86AC292C94B20039A1A7 /* UpdateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateViewController.swift; sourceTree = "<group>"; };
+		E0FADA8A2935E1CD002D6C6B /* EmployeeVO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmployeeVO.swift; sourceTree = "<group>"; };
+		E0FADA8E2935F037002D6C6B /* dataList2.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dataList2.csv; path = ../../../../dataList2.csv; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,7 +76,8 @@
 		E03BAEA0292740FA009D9C08 /* GngsProject */ = {
 			isa = PBXGroup;
 			children = (
-				E0BE86AB292C94820039A1A7 /* 修正画面 */,
+				E0FADA892935E1AB002D6C6B /* VO */,
+				E0FADA882935E17A002D6C6B /* Update */,
 				E05F9B11292B0E0700C3FAA1 /* List */,
 				E03BAEBC29275327009D9C08 /* Login */,
 				E03BAEB92927449B009D9C08 /* DB */,
@@ -120,12 +125,21 @@
 			path = List;
 			sourceTree = "<group>";
 		};
-		E0BE86AB292C94820039A1A7 /* 修正画面 */ = {
+		E0FADA882935E17A002D6C6B /* Update */ = {
 			isa = PBXGroup;
 			children = (
 				E0BE86AC292C94B20039A1A7 /* UpdateViewController.swift */,
 			);
-			path = "修正画面";
+			path = Update;
+			sourceTree = "<group>";
+		};
+		E0FADA892935E1AB002D6C6B /* VO */ = {
+			isa = PBXGroup;
+			children = (
+				E0FADA8A2935E1CD002D6C6B /* EmployeeVO.swift */,
+				E0FADA8E2935F037002D6C6B /* dataList2.csv */,
+			);
+			path = VO;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -187,6 +201,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E03BAEAE292740FB009D9C08 /* LaunchScreen.storyboard in Resources */,
+				E0FADA8F2935F037002D6C6B /* dataList2.csv in Resources */,
 				E03BAEAB292740FB009D9C08 /* Assets.xcassets in Resources */,
 				E03BAEA9292740FA009D9C08 /* Main.storyboard in Resources */,
 				E0BE86A8292B7D820039A1A7 /* gngsLogo.png in Resources */,
@@ -200,6 +215,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E0FADA8B2935E1CD002D6C6B /* EmployeeVO.swift in Sources */,
 				E03BAEA6292740FA009D9C08 /* ViewController.swift in Sources */,
 				E03BAEBB292744EA009D9C08 /* DBInfo.swift in Sources */,
 				E03BAEA2292740FA009D9C08 /* AppDelegate.swift in Sources */,
