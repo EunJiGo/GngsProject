@@ -25,6 +25,9 @@
 		E0FADA982936F74A002D6C6B /* LoginVO.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0FADA972936F74A002D6C6B /* LoginVO.swift */; };
 		E0FADA9A293704C9002D6C6B /* ListVO.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0FADA99293704C9002D6C6B /* ListVO.swift */; };
 		E0FADA9D293732B6002D6C6B /* InsertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0FADA9C293732B6002D6C6B /* InsertViewController.swift */; };
+		E0FADA9F29374410002D6C6B /* UpdateVO.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0FADA9E29374410002D6C6B /* UpdateVO.swift */; };
+		E0FADAA12938403E002D6C6B /* PositionVO.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0FADAA02938403E002D6C6B /* PositionVO.swift */; };
+		E0FADAA3293864F7002D6C6B /* TeamVO.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0FADAA2293864F7002D6C6B /* TeamVO.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,6 +52,9 @@
 		E0FADA972936F74A002D6C6B /* LoginVO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVO.swift; sourceTree = "<group>"; };
 		E0FADA99293704C9002D6C6B /* ListVO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListVO.swift; sourceTree = "<group>"; };
 		E0FADA9C293732B6002D6C6B /* InsertViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsertViewController.swift; sourceTree = "<group>"; };
+		E0FADA9E29374410002D6C6B /* UpdateVO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateVO.swift; sourceTree = "<group>"; };
+		E0FADAA02938403E002D6C6B /* PositionVO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PositionVO.swift; sourceTree = "<group>"; };
+		E0FADAA2293864F7002D6C6B /* TeamVO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamVO.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,7 +154,10 @@
 			children = (
 				E0FADA972936F74A002D6C6B /* LoginVO.swift */,
 				E0FADA99293704C9002D6C6B /* ListVO.swift */,
+				E0FADA9E29374410002D6C6B /* UpdateVO.swift */,
 				E0FADA8A2935E1CD002D6C6B /* EmployeeVO.swift */,
+				E0FADAA02938403E002D6C6B /* PositionVO.swift */,
+				E0FADAA2293864F7002D6C6B /* TeamVO.swift */,
 				E0FADA8E2935F037002D6C6B /* dataList2.csv */,
 			);
 			path = VO;
@@ -244,8 +253,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				E0FADA8B2935E1CD002D6C6B /* EmployeeVO.swift in Sources */,
+				E0FADA9F29374410002D6C6B /* UpdateVO.swift in Sources */,
 				E03BAEA6292740FA009D9C08 /* ViewController.swift in Sources */,
 				E0FADA942936E365002D6C6B /* AlertViewController.swift in Sources */,
+				E0FADAA3293864F7002D6C6B /* TeamVO.swift in Sources */,
 				E03BAEBB292744EA009D9C08 /* DBInfo.swift in Sources */,
 				E0FADA982936F74A002D6C6B /* LoginVO.swift in Sources */,
 				E03BAEA2292740FA009D9C08 /* AppDelegate.swift in Sources */,
@@ -253,6 +264,7 @@
 				E0BE86AA292C63330039A1A7 /* TestViewController.swift in Sources */,
 				E0BE86AD292C94B20039A1A7 /* UpdateViewController.swift in Sources */,
 				E0FADA9D293732B6002D6C6B /* InsertViewController.swift in Sources */,
+				E0FADAA12938403E002D6C6B /* PositionVO.swift in Sources */,
 				E0FADA9A293704C9002D6C6B /* ListVO.swift in Sources */,
 				E03BAEA4292740FA009D9C08 /* SceneDelegate.swift in Sources */,
 			);

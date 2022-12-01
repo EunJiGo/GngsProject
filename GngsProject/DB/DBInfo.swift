@@ -15,7 +15,6 @@ class DBInfo {
         let dbPath = self.getDBPath()
         print(dbPath)
         self.openDB(dbPath: dbPath)
-        team()
     }
     
     deinit {
@@ -335,44 +334,33 @@ class DBInfo {
             sqlite3_finalize(stmt)
             return employeeCD
         }
-    
-    
-    typealias LoginRecord = (String, String, String, String)
-    
-    func find() -> [LoginRecord] {
-//        createTable()
-        var stmt: OpaquePointer? = nil // 컴파일된 SQL을 담을 객체
-        // 반환할 데이터를 담은 [DepartRecord] 타입의 객체 정의
-        var loginList = [LoginRecord]()
-        
-        let sql = "select * from login_tbl"
-            
-        if sqlite3_prepare(db, sql, -1, &stmt, nil) != SQLITE_OK {
-            let err = String(cString: sqlite3_errmsg(db))
-            print(err)
-            print("Prepare Statement Fail")
-        }else {
-            print("find() prepare - login테이블의 모든 정보 가지고오기")
+
+  
+    func loginInfoGet() -> [LoginVO] {
+        var stmt: OpaquePointer? = nil
+        var login = [LoginVO]()
+        let query = "select * from login_tbl"
+        guard sqlite3_prepare(db, query, -1, &stmt, nil) == SQLITE_OK else{
+            print("loginValueGet Method Fail")
+            return login
         }
-        
         while sqlite3_step(stmt) == SQLITE_ROW {
-            let employeeNum = String(cString: sqlite3_column_text(stmt, 0))
-            let employeeID = String(cString: sqlite3_column_text(stmt, 1))
-            let employeePW = String(cString: sqlite3_column_text(stmt, 2))
-            let lastLogin: String
+            var loginInfo = LoginVO()
+            loginInfo.employeeNum = String(cString: sqlite3_column_text(stmt, 0))
+            loginInfo.employeeEmail = String(cString: sqlite3_column_text(stmt, 1))
+            loginInfo.employeePw = String(cString: sqlite3_column_text(stmt, 2))
             if sqlite3_column_text(stmt, 3) != nil {
-                lastLogin = String(cString: sqlite3_column_text(stmt, 3))
+                loginInfo.lastLogin = String(cString: sqlite3_column_text(stmt, 3))
             } else {
-                lastLogin = ""
+                loginInfo.lastLogin = ""
             }
-            loginList.append((employeeNum, employeeID, employeePW, lastLogin))
+            login.append(loginInfo)
         }
         sqlite3_finalize(stmt)
-        return loginList
+        return login
     }
-    
-    
-    func loginInfoGet(id: String) -> LoginVO {
+
+    func loginValueGet(id: String) -> LoginVO {
         let loginInfo = LoginVO()
         var stmt: OpaquePointer? = nil
         let query = "SELECT * FROM login_tbl WHERE EMPLOYEE_ID = '\(id)'"
@@ -387,8 +375,6 @@ class DBInfo {
             loginInfo.employeeNum = String(cString: sqlite3_column_text(stmt, 0))
             loginInfo.employeeEmail = String(cString: sqlite3_column_text(stmt, 1))
             loginInfo.employeePw = String(cString: sqlite3_column_text(stmt, 2))
-            print(loginInfo.employeeNum)
-            print(loginInfo.employeeEmail)
             sqlite3_finalize(stmt)
             return loginInfo
         } else {
@@ -397,83 +383,108 @@ class DBInfo {
         }
     }
     
-   
-    typealias empRecord = (String, String, String, String)
-    func empList() -> [empRecord] {
-//        createTable()
-        var stmt: OpaquePointer? = nil // 컴파일된 SQL을 담을 객체
-        // 반환할 데이터를 담은 [DepartRecord] 타입의 객체 정의
-        var empList = [empRecord]()
-        
-        let sql = "select * from employee_tbl"
-            
-        if sqlite3_prepare(db, sql, -1, &stmt, nil) != SQLITE_OK {
-            let err = String(cString: sqlite3_errmsg(db))
-            print(err)
 
-            print("Prepatre Statement Fail")
-        }else {
-            print("empList() prepare employee 테이블에서 전부 데이터 가지고 와서 일람화면 만들어주기 위함")
-        }
+    func listInfoGet() -> [ListVO] {
+        var stmt: OpaquePointer? = nil
         
+        var list = [ListVO]()
+        let query = "select * from employee_tbl"
+        guard sqlite3_prepare(db, query, -1, &stmt, nil) == SQLITE_OK else{
+            print("listInfoGet Method Fail")
+            return list
+        }
         while sqlite3_step(stmt) == SQLITE_ROW {
-            let empNum = String(cString: sqlite3_column_text(stmt, 0))
-            let empKanji = String(cString: sqlite3_column_text(stmt, 1))
-            let empPosition = positionChange(ps: String(cString: sqlite3_column_text(stmt, 6)))
-            let empTeam = teamChange(team: String(cString: sqlite3_column_text(stmt, 7)))
-            empList.append((empNum, empKanji, empPosition, empTeam))
+            var listInfo = ListVO()
+            listInfo.employeeNum = String(cString: sqlite3_column_text(stmt, 0))
+            listInfo.employeeKj = String(cString: sqlite3_column_text(stmt, 1))
+            listInfo.position = positionChange(ps: String(cString: sqlite3_column_text(stmt, 6)))
+            listInfo.team = teamChange(team: String(cString: sqlite3_column_text(stmt, 7)))
+            list.append(listInfo)
         }
         sqlite3_finalize(stmt)
-        return empList
+        return list
     }
     
-    typealias empDetalRecord = (String, String, String, String, String, Int, String, String, String, Int, String)
-    func empDetailList() -> [empDetalRecord] {
-
-        var empDetailList = [empDetalRecord]()
-        var stmt: OpaquePointer? = nil // 컴파일된 SQL을 담을 객체
-  
-        
-        let sql = "select * from employee_tbl"
+    func updateDetail(index: Int) -> UpdateVO {
+        var updateDetail = [UpdateVO]()
+        var stmt: OpaquePointer? = nil
+        let query = "SELECT * FROM employee_tbl JOIN login_tbl on login_tbl.EMPLOYEE_NUM=employee_tbl.EMPLOYEE_NUM"
             
-        if sqlite3_prepare(db, sql, -1, &stmt, nil) != SQLITE_OK {
+        guard sqlite3_prepare(db, query, -1, &stmt, nil) == SQLITE_OK else{
             let err = String(cString: sqlite3_errmsg(db))
+            print("updateDetail Method Fail")
             print(err)
-
-            print("Prepatre Statement Fail")
-        }else {
-            print("prepare")
+            return UpdateVO()
+        }
+        while sqlite3_step(stmt) == SQLITE_ROW {
+            var listEmpUpd = UpdateVO()
+            listEmpUpd.employeeNum = String(cString: sqlite3_column_text(stmt, 0))
+            listEmpUpd.employeeEmail = String(cString: sqlite3_column_text(stmt, 14))
+            listEmpUpd.employeeKj = String(cString: sqlite3_column_text(stmt, 1))
+            listEmpUpd.employeeKt = String(cString: sqlite3_column_text(stmt, 2))
+            listEmpUpd.employeeEng = String(cString: sqlite3_column_text(stmt, 3))
+            listEmpUpd.employeeTel = String(cString: sqlite3_column_text(stmt, 4))
+            listEmpUpd.gender = Int(sqlite3_column_int(stmt, 5))
+            listEmpUpd.position = positionChange(ps: String(cString: sqlite3_column_text(stmt, 6)))
+            listEmpUpd.team = teamChange(team: String(cString: sqlite3_column_text(stmt, 7)))
+            listEmpUpd.megazine = Int(sqlite3_column_int(stmt, 9))
+            if sqlite3_column_text(stmt, 11) != nil {
+                listEmpUpd.registerDate = String(cString: sqlite3_column_text(stmt, 11))
+            } else {
+                listEmpUpd.registerDate = ""
+            }
+            if sqlite3_column_text(stmt, 12) != nil {
+                listEmpUpd.changeDate = String(cString: sqlite3_column_text(stmt, 11))
+            } else {
+                listEmpUpd.changeDate = ""
+            }
+            if sqlite3_column_text(stmt, 10) != nil {
+                listEmpUpd.memo = String(cString: sqlite3_column_text(stmt, 10))
+            } else {
+                listEmpUpd.memo = ""
+            }
+            updateDetail.append(listEmpUpd)
+        }
+        sqlite3_finalize(stmt)
+        return updateDetail[index]
+    }
+    
+    func positionInfo() -> [PositionVO] {
+        var stmt: OpaquePointer? = nil
+        var positionList = [PositionVO]()
+        let query = "select * from position_tbl"
+        guard sqlite3_prepare(db, query, -1, &stmt, nil) == SQLITE_OK else{
+            print("positionInfo Method Fail")
+            return positionList
+        }
+        while sqlite3_step(stmt) == SQLITE_ROW {
+            var positionListInfo = PositionVO()
+            positionListInfo.positionCode = String(cString: sqlite3_column_text(stmt, 0))
+            positionListInfo.positionName = String(cString: sqlite3_column_text(stmt, 1))
+            positionList.append(positionListInfo)
         }
         
-        while sqlite3_step(stmt) == SQLITE_ROW {
-            let empNum = String(cString: sqlite3_column_text(stmt, 0))
-            let empKanji = String(cString: sqlite3_column_text(stmt, 1))
-            let empKana = String(cString: sqlite3_column_text(stmt, 2))
-            let empEng = String(cString: sqlite3_column_text(stmt, 3))
-            let tel = String(cString: sqlite3_column_text(stmt, 4))
-            let gender: Int = Int(sqlite3_column_int(stmt, 5))
-            let empPosition = positionChange(ps: String(cString: sqlite3_column_text(stmt, 6)))
-            let empTeam = teamChange(team: String(cString: sqlite3_column_text(stmt, 7)))
-            let megazine: Int = Int(sqlite3_column_int(stmt, 9))
-            let RegDate: String
-            if sqlite3_column_text(stmt, 11) != nil {
-                RegDate = String(cString: sqlite3_column_text(stmt, 11))
-            } else {
-                    RegDate = ""
-            }
-            let memo: String
-            if sqlite3_column_text(stmt, 10) != nil {
-                memo = String(cString: sqlite3_column_text(stmt, 10	))
-            } else {
-                memo = ""
-            }
-            
-            empDetailList.append((empNum, empKanji, empKana, empEng, tel, gender, empPosition, empTeam, RegDate, megazine, memo))
-        }
-     
         sqlite3_finalize(stmt)
-       //sqlite3_close(db)
-        return empDetailList
+        return positionList
+    }
+    
+    func teamInfo() -> [TeamVO] {
+        var stmt: OpaquePointer? = nil
+        var teamList = [TeamVO]()
+        let query = "select * from team_tbl"
+        guard sqlite3_prepare(db, query, -1, &stmt, nil) == SQLITE_OK else{
+            print("teamInfo Method Fail")
+            return teamList
+        }
+        while sqlite3_step(stmt) == SQLITE_ROW {
+            var teamListInfo = TeamVO()
+            teamListInfo.teamCode = String(cString: sqlite3_column_text(stmt, 0))
+            teamListInfo.teamName = String(cString: sqlite3_column_text(stmt, 1))
+            teamList.append(teamListInfo)
+        }
+        
+        sqlite3_finalize(stmt)
+        return teamList
     }
     
     func positionChange(ps: String)->String{

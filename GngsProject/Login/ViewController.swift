@@ -24,7 +24,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     @IBAction func loginButton(_ sender: UIButton) {
         let idCount = id.text?.count
         let pwCount = pw.text?.count
-        let empLoginInfo = dbInfo.loginInfoGet(id: id.text!)
+        let empLoginInfo = dbInfo.loginValueGet(id: id.text!)
         
         if idCount == 0 {
             alertMessage.wrongCaseAlert(title: "", message: "アカウントを入力ください", target: self)
