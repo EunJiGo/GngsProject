@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 class DBInfo {
     var db: OpaquePointer? = nil
@@ -19,22 +20,14 @@ class DBInfo {
     
     deinit {
         sqlite3_close(db)
-        print("deinit")
-    }
-    
-    func closeDB() {
-        sqlite3_close(db)
-        print("deinit")
     }
     
     func getDBPath() -> String {
-        //앱 내 문서 디렉토리 경로에서 SQLite DB파일을 찾는다
-        let fileMgr = FileManager() // 파일 매니저 객체 생성
+        let fileMgr = FileManager()
         let docPathURL = fileMgr.urls(for: .documentDirectory, in: .userDomainMask).first!
         let dbPath = docPathURL.appendingPathComponent("GngsPj.sqlite").path
         return dbPath
     }
-
     func openDB(dbPath: String){
         if sqlite3_open(dbPath, &db) == SQLITE_OK {
             print("OPEN DB")
@@ -50,45 +43,41 @@ class DBInfo {
     }
     
     func loginCreateTable() {
-        let createTable = "CREATE TABLE IF NOT EXISTS login_tbl (EMPLOYEE_NUM TEXT PRIMARY KEY NOT NULL, EMPLOYEE_ID TEXT UNIQUE NOT NULL, EMPLOYEE_PW TEXT NOT NULL, LAST_LOGIN TEXT)"
-        if sqlite3_exec(db, createTable, nil, nil, nil) == SQLITE_OK{
-        } else {
-            let err = String(cString: sqlite3_errmsg(db))
-            print(err)
-            print("table create fail")
+        let query = "CREATE TABLE IF NOT EXISTS login_tbl (EMPLOYEE_NUM TEXT PRIMARY KEY NOT NULL, EMPLOYEE_ID TEXT UNIQUE NOT NULL, EMPLOYEE_PW TEXT NOT NULL, LAST_LOGIN TEXT)"
+        guard sqlite3_exec(db, query, nil, nil, nil) == SQLITE_OK else {
+            let errmsg = String(cString: sqlite3_errmsg(db))
+            print("login table create fail")
+            print(errmsg)
             return
         }
     }
     
     func employCreateTable() {
-        let createTable = "CREATE TABLE IF NOT EXISTS employee_tbl (EMPLOYEE_NUM TEXT PRIMARY KEY NOT NULL, NAME_KANJI TEXT NOT NULL, NAME_KANA TEXT NOT NULL, NAME_ENG TEXT NOT NULL, TEL TEXT NOT NULL, GENDER INTEGER NOT NULL, POSITION TEXT NOT NULL, TEAM TEXT NOT NULL, AGREE INTEGER DEFAULT 0, MEGAZINE INTEGER NOT NULL, MEMO TEXT, REGISTER_DATE TEXT DEFAULT CURRENT_TIMESTAMP, CHANGE_DATE TEXT)"
-        if sqlite3_exec(db, createTable, nil, nil, nil) == SQLITE_OK{
-        } else {
-            let err = String(cString: sqlite3_errmsg(db))
-            print(err)
-            print("table create fail")
+        let query = "CREATE TABLE IF NOT EXISTS employee_tbl (EMPLOYEE_NUM TEXT PRIMARY KEY NOT NULL, NAME_KANJI TEXT NOT NULL, NAME_KANA TEXT NOT NULL, NAME_ENG TEXT NOT NULL, TEL TEXT NOT NULL, GENDER INTEGER NOT NULL, POSITION TEXT NOT NULL, TEAM TEXT NOT NULL, AGREE INTEGER DEFAULT 0, MEGAZINE INTEGER NOT NULL, MEMO TEXT, REGISTER_DATE TEXT, CHANGE_DATE TEXT)"
+        guard sqlite3_exec(db, query, nil, nil, nil) == SQLITE_OK else {
+            let errmsg = String(cString: sqlite3_errmsg(db))
+            print("employee table create fail")
+            print(errmsg)
             return
         }
     }
     
     func positionCreateTable() {
-        let createTable = "CREATE TABLE IF NOT EXISTS position_tbl (POSITION_CODE TEXT PRIMARY KEY NOT NULL, POSITION_NAME TEXT NOT NULL)"
-        if sqlite3_exec(db, createTable, nil, nil, nil) == SQLITE_OK{
-        } else {
-            let err = String(cString: sqlite3_errmsg(db))
-            print(err)
-            print("table create fail")
+        let query = "CREATE TABLE IF NOT EXISTS position_tbl (POSITION_CODE TEXT PRIMARY KEY NOT NULL, POSITION_NAME TEXT NOT NULL)"
+        guard sqlite3_exec(db, query, nil, nil, nil) == SQLITE_OK else {
+            let errmsg = String(cString: sqlite3_errmsg(db))
+            print("position table create fail")
+            print(errmsg)
             return
         }
     }
     
     func teamCreateTable() {
-        let createTable = "CREATE TABLE IF NOT EXISTS team_tbl (TEAM_CODE TEXT PRIMARY KEY NOT NULL, TEAM_NAME TEXT NOT NULL)"
-        if sqlite3_exec(db, createTable, nil, nil, nil) == SQLITE_OK{
-        } else {
-            let err = String(cString: sqlite3_errmsg(db))
-            print(err)
-            print("table create fail")
+        let query = "CREATE TABLE IF NOT EXISTS team_tbl (TEAM_CODE TEXT PRIMARY KEY NOT NULL, TEAM_NAME TEXT NOT NULL)"
+        guard sqlite3_exec(db, query, nil, nil, nil) == SQLITE_OK else {
+            let errmsg = String(cString: sqlite3_errmsg(db))
+            print("team table create fail")
+            print(errmsg)
             return
         }
     }
@@ -98,10 +87,8 @@ class DBInfo {
         var csvLines = [String]()
         var empList = [EmployeeVO]()
         guard let path = Bundle.main.path(forResource:"dataList2", ofType:"csv") else {
-            print("csvファイルがないよ")
             return
         }
-
         do {
             let csvString = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
             csvLines = csvString.replacingOccurrences(of: "\r\n", with: "\n").replacingOccurrences(of: "\r", with: "\n").components(separatedBy: .newlines)
@@ -122,34 +109,32 @@ class DBInfo {
             empVo.employeeTel = empDetail[6]
             let empGender = Int(empDetail[7])!
             empVo.gender = empGender
-            empVo.position = empDetail[8]
-            empVo.team = empDetail[9]
-            empVo.registerDate = empDetail[10]
+            let empMegazine = Int(empDetail[8])!
+            empVo.megazine = empMegazine
+            empVo.position = empDetail[9]
+            empVo.team = empDetail[10]
+            empVo.registerDate = empDetail[11]
             empList.append(empVo)
-            
-            csvEmpInput(employeeNum: empDetail[0], employeeKj: empDetail[3], employeeKt: empDetail[4], employeeEng: empDetail[5], employeeTel: empDetail[6], gender: empGender, position: empDetail[8], team: empDetail[9], registerDate: empDetail[10])
-            
+            print(empVo.registerDate)
+            csvEmpInput(employeeNum: empDetail[0], employeeKj: empDetail[3], employeeKt: empDetail[4], employeeEng: empDetail[5], employeeTel: empDetail[6], gender: empGender, megazine: empMegazine, position: empDetail[9], team: empDetail[10], registerDate: empDetail[11])
             csvLoginInput(employeeNum: empDetail[0], employeeEmail: empDetail[1], employeePw: empDetail[2])
         }
     }
     
-    func csvEmpInput(employeeNum: String, employeeKj: String, employeeKt: String, employeeEng: String, employeeTel: String, gender: Int, position: String, team: String, registerDate: String ) {
+    func csvEmpInput(employeeNum: String, employeeKj: String, employeeKt: String, employeeEng: String, employeeTel: String, gender: Int, megazine: Int, position: String, team: String, registerDate: String ) {
         var stmt: OpaquePointer?
-        let query = "INSERT INTO employee_tbl (EMPLOYEE_NUM, NAME_KANJI, NAME_KANA, NAME_ENG, TEL, GENDER, POSITION, TEAM, MEGAZINE) VALUES ('\(employeeNum)', '\(employeeKj)', '\(employeeKt)', '\(employeeEng)', '\(employeeTel)', \(gender), '\(position)', '\(team)', '\(registerDate)')"
+        let query = "INSERT INTO employee_tbl (EMPLOYEE_NUM, NAME_KANJI, NAME_KANA, NAME_ENG, TEL, GENDER, MEGAZINE, POSITION, TEAM, REGISTER_DATE) VALUES ('\(employeeNum)', '\(employeeKj)', '\(employeeKt)', '\(employeeEng)', '\(employeeTel)', \(gender), '\(megazine)', '\(position)', '\(team)', '\(registerDate)')"
        
-        if sqlite3_prepare(db, query, -1, &stmt, nil) != SQLITE_OK {
-            print("insert fail")
-            let err = String(cString: sqlite3_errmsg(db))
-            print(err)
-        }else {
-            print("insert success")
+        guard sqlite3_prepare(db, query, -1, &stmt, nil) == SQLITE_OK else {
+            let errmsg = String(cString: sqlite3_errmsg(db))
+            print(errmsg)
+            return
         }
-        if sqlite3_step(stmt) != SQLITE_DONE {
-            print("insert ffail")
-        }else {
-            print("insert ssucess")
+        guard sqlite3_step(stmt) == SQLITE_DONE else {
+            let errmsg = String(cString: sqlite3_errmsg(stmt))
+            print(errmsg)
+            return
         }
-        
         sqlite3_finalize(stmt)
     }
         
@@ -157,61 +142,51 @@ class DBInfo {
         var stmt: OpaquePointer?
         let query = "INSERT INTO login_tbl (EMPLOYEE_NUM, EMPLOYEE_ID, EMPLOYEE_PW) VALUES ('\(employeeNum)', '\(employeeEmail)', '\(employeePw)')"
            
-        if sqlite3_prepare(db, query, -1, &stmt, nil) != SQLITE_OK {
-            print("insert fail")
-            let err = String(cString: sqlite3_errmsg(db))
-            print(err)
-        }else {
-            print("insert success")
+        guard sqlite3_prepare(db, query, -1, &stmt, nil) == SQLITE_OK else {
+            let errmsg = String(cString: sqlite3_errmsg(db))
+            print(errmsg)
+            return
         }
-        if sqlite3_step(stmt) != SQLITE_DONE {
-            print("insert ffail")
-        }else {
-            print("insert ssucess")
+        guard sqlite3_step(stmt) == SQLITE_DONE else {
+            return
         }
         sqlite3_finalize(stmt)
     }
+
     
     func lastLoginUpdate(id: String) {
         var stmt: OpaquePointer? = nil
         var formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         var current_date_string = formatter.string(from: Date())
-        let sql = "UPDATE login_tbl SET LAST_LOGIN = '\(current_date_string)' WHERE EMPLOYEE_ID= '\(id)'"
-        if sqlite3_prepare(db, sql, -1, &stmt, nil) != SQLITE_OK{
+        let query = "UPDATE login_tbl SET LAST_LOGIN = '\(current_date_string)' WHERE EMPLOYEE_ID= '\(id)'"
+        guard sqlite3_prepare(db, query, -1, &stmt, nil) == SQLITE_OK else{
             let errmsg = String(cString: sqlite3_errmsg(db)!)
             print("error preparing insert: \(errmsg)")
+            return
         }
-        if sqlite3_step(stmt) != SQLITE_DONE {
+        guard sqlite3_step(stmt) != SQLITE_DONE else {
             let errmsg = String(cString: sqlite3_errmsg(db)!)
             print("failure inserting hero111: \(errmsg)")
-            sqlite3_finalize(stmt)
+            return
         }
+        sqlite3_finalize(stmt)
     }
     
     func LoginInfoInsert() -> Bool {
         print("loginInsert")
         var stmt: OpaquePointer?
         let employee_num: String = self.employeeNum()
-        
-//        let query = "INSERT INTO login_tbl (EMPLOYEE_NUM, EMPLOYEE_ID, EMPLOYEE_PW) VALUES ('\(employee_num)', 'tanaka@gmail.com', '@tanaka1234' )"
-          let query = "INSERT INTO login_tbl (EMPLOYEE_NUM, EMPLOYEE_ID, EMPLOYEE_PW) VALUES ('\(employee_num)', 'aaaa', 'aaaa' )"
+        let query = "INSERT INTO login_tbl (EMPLOYEE_NUM, EMPLOYEE_ID, EMPLOYEE_PW) VALUES ('\(employee_num)', 'aaaa', 'aaaa' )"
        
-        if sqlite3_prepare(db, query, -1, &stmt, nil) != SQLITE_OK {
-            print("insert fail")
+        guard sqlite3_prepare(db, query, -1, &stmt, nil) == SQLITE_OK else {
             let err = String(cString: sqlite3_errmsg(db))
             print(err)
-        }else {
-            
-            print("insert success")
+            return false
         }
-        
-        if sqlite3_step(stmt) != SQLITE_DONE {
-            print("insert ffail")
-        }else {
-            print("insert ssucess")
+        guard sqlite3_step(stmt) == SQLITE_DONE else {
+            return false
         }
-        
         sqlite3_finalize(stmt)
         return true
     }
@@ -219,122 +194,99 @@ class DBInfo {
     func team() {
         var stmt: OpaquePointer?
         let query = "INSERT INTO team_tbl (TEAM_CODE, TEAM_NAME) VALUES ('O1', '第1チーム'), ('O2', '第2チーム'), ('O3', '第3チーム'), ('O4', '第4チーム')"
-        if sqlite3_prepare(db, query, -1, &stmt, nil) != SQLITE_OK {
+        guard sqlite3_prepare(db, query, -1, &stmt, nil) == SQLITE_OK else {
             let err = String(cString: sqlite3_errmsg(db))
             print(err)
-        }else {
-            
+            return
         }
-        if sqlite3_step(stmt) != SQLITE_DONE {
+        guard sqlite3_step(stmt) == SQLITE_DONE else {
             print("team Insert Fail")
-        } else {
-            print("team Insert Ok")
+            return
         }
     }
     
     func position() {
         var stmt: OpaquePointer?
         let query = "INSERT INTO position_tbl (POSITION_CODE, POSITION_NAME) VALUES ('O6', '社長')"
-        if sqlite3_prepare(db, query, -1, &stmt, nil) != SQLITE_OK {
+        guard sqlite3_prepare(db, query, -1, &stmt, nil) == SQLITE_OK else {
             let err = String(cString: sqlite3_errmsg(db))
             print(err)
-        } else {
+            return
         }
-        if sqlite3_step(stmt) != SQLITE_DONE {
-            print("position insert Fail")
-        } else {
-            print("position insert OK")
+        guard sqlite3_step(stmt) == SQLITE_DONE else {
+            return
         }
         sqlite3_finalize(stmt)
     }
+    
     
     func employeeInfoInsert() -> Bool {
         var stmt: OpaquePointer?
         let employee_num: String = self.employeeNum()
         print(employee_num)
         let query = "INSERT INTO employee_tbl (EMPLOYEE_NUM, NAME_KANJI, NAME_KANA, NAME_ENG, TEL, GENDER, POSITION, TEAM, MEGAZINE) VALUES ('\(employee_num)', '桃子', 'モモコ', 'momoko', '080-9600-5997', 1, '社員', '第３チーム', 1)"
-//        let query = "INSERT INTO employee_tbl (EMPLOYEE_NUM, NAME_KANJI, NAME_KANA, NAME_ENG, TEL, GENDER, POSITION, TEAM, MEGAZINE) VALUES ('22-11210001', '高恩智', 'ゴウンジ', 'GOEUNJI', '080-2039-1981', 1, '社員', '第1チーム', 1)"
-//        let query = "DELETE FROM employee_tbl WHERE NAME_KANJI = '春'"
-        if sqlite3_prepare(db, query, -1, &stmt, nil) != SQLITE_OK {
-            print("insert fail")
+//        let query = "DELETE FROM employee_tbl WHERE tel = '080-1234-5678'"
+        guard sqlite3_prepare(db, query, -1, &stmt, nil) == SQLITE_OK else {
             let err = String(cString: sqlite3_errmsg(db))
             print(err)
-        }else {
-            
-            print("insert success")
+            return false
         }
-        
-        if sqlite3_step(stmt) != SQLITE_DONE {
-            print("insert ffail")
-        }else {
-            print("insert ssucess")
+        guard sqlite3_step(stmt) == SQLITE_DONE else {
+            return false
         }
-        
         sqlite3_finalize(stmt)
         return true
     }
         
-        func employeeNum() -> String{
-            var formatter = DateFormatter()
-            formatter.dateFormat = "yy"
-            var current_year_string = formatter.string(from: Date())
-            print(current_year_string)
-            
-            formatter.dateFormat = "MM"
-            var current_month_string = formatter.string(from: Date())
-            print(current_month_string)
-            
-            formatter.dateFormat = "dd"
-            var current_date_string = formatter.string(from: Date())
-            print(current_date_string)
-            
-            var stmt: OpaquePointer? = nil // 컴파일된 SQL을 담을 객체
-            let query = "SELECT COUNT(*) FROM employee_tbl"
-        //employeeNum: String, employeeId: String, employeePw: String, LastLogin: String
-            
-            if sqlite3_prepare(db, query, -1, &stmt, nil) != SQLITE_OK {
-                let err = String(cString: sqlite3_errmsg(db))
-                print(err)
-                print("emPrepare Statement Fail")
-            }else {
-                print("emprepare")
-            }
-            if sqlite3_step(stmt) != SQLITE_ROW {
-                print("emsel ffail")
-            }else {
-                print("emsel ssucess")
-                
-            }
-            let empCount = sqlite3_column_int(stmt, 0)
-            print("확인")
-            print(empCount)
-            var rs: String = ""
-            if empCount >= 0 && empCount <= 8 {
-                let empCD = empCount+1
-                rs = "000\(empCD)"
-                
-            } else if empCount >= 9 && empCount <= 98 {
-                let empCD = empCount+1
-                rs = "00\(empCD)"
-            } else if empCount >= 99 && empCount <= 998 {
-                let empCD = empCount+1
-                rs = "0\(empCD)"
-            } else if empCount >= 999 && empCount <= 9998 {
-                let empCD = empCount+1
-                rs = "\(empCD)"
-            } else {
-                print("Error")
-            }
-            
-            print("rs")
-            print(rs)
-            
-            let employeeCD = "\(current_year_string)-\(current_month_string)\(current_date_string)\(rs)"
-            print(employeeCD)
-            sqlite3_finalize(stmt)
-            return employeeCD
+    func employeeNum() -> String{
+        var formatter = DateFormatter()
+        formatter.dateFormat = "yy"
+        var current_year_string = formatter.string(from: Date())
+        print(current_year_string)
+        
+        formatter.dateFormat = "MM"
+        var current_month_string = formatter.string(from: Date())
+        print(current_month_string)
+        
+        formatter.dateFormat = "dd"
+        var current_date_string = formatter.string(from: Date())
+        print(current_date_string)
+        
+        var stmt: OpaquePointer? = nil // 컴파일된 SQL을 담을 객체
+        let query = "SELECT COUNT(*) FROM employee_tbl"
+    //employeeNum: String, employeeId: String, employeePw: String, LastLogin: String
+        
+        guard sqlite3_prepare(db, query, -1, &stmt, nil) == SQLITE_OK else {
+            let err = String(cString: sqlite3_errmsg(db))
+            print(err)
+            return ""
         }
-
+        guard sqlite3_step(stmt) == SQLITE_ROW else{
+            return ""
+        }
+        
+        let empCount = sqlite3_column_int(stmt, 0)
+        var rs: String = ""
+        if empCount >= 0 && empCount <= 8 {
+            let empCD = empCount+1
+            rs = "000\(empCD)"
+        } else if empCount >= 9 && empCount <= 98 {
+            let empCD = empCount+1
+            rs = "00\(empCD)"
+        } else if empCount >= 99 && empCount <= 998 {
+            let empCD = empCount+1
+            rs = "0\(empCD)"
+        } else if empCount >= 999 && empCount <= 9998 {
+            let empCD = empCount+1
+            rs = "\(empCD)"
+        } else {
+            print("Error")
+        }
+        
+        let employeeCD = "\(current_year_string)-\(current_month_string)\(current_date_string)\(rs)"
+        sqlite3_finalize(stmt)
+        return employeeCD
+    }
   
     func loginInfoGet() -> [LoginVO] {
         var stmt: OpaquePointer? = nil
@@ -525,22 +477,24 @@ class DBInfo {
         return team //change
     }
     
-    func update(nameKj: String, nameKn: String, nameEng: String, tel: String, position: String, team: String, megazine: Int, memo: String, empNum: String) {
+    func update(nameKj: String, nameKn: String, nameEng: String, tel: String, position: String, team: String, megazine: Int, memo: String, changeDate: String, empNum: String) {
+        print("ddddddddddd")
         var stmt: OpaquePointer? = nil
-        let sql = "UPDATE employee_tbl SET NAME_KANJI = '\(nameKj)', NAME_KANA = '\(nameKn)', NAME_ENG = '\(nameEng)', TEL = '\(tel)', POSITION = '\(position)', TEAM = '\(team)', MEGAZINE = '\(megazine)', MEMO = '\(memo)' WHERE EMPLOYEE_NUM = '\(empNum)'"
+        let query = "UPDATE employee_tbl SET NAME_KANJI = '\(nameKj)', NAME_KANA = '\(nameKn)', NAME_ENG = '\(nameEng)', TEL = '\(tel)', POSITION = '\(position)', TEAM = '\(team)', MEGAZINE = '\(megazine)', MEMO = '\(memo)', CHANGE_DATE = '\(changeDate)' WHERE EMPLOYEE_NUM = '\(empNum)'"
 //        let sql = "UPDATE employee_tbl SET NAME_KANJI = '\(nameKj)', NAME_KANA = '\(nameKn)', NAME_ENG = '\(nameEng)', TEL = '\(tel)', POSITION = '\(position)', TEAM = '\(team)', MEGAZINE = \(megazine), MEMO = '\(memo)' WHERE = EMPLOYEE_NUM = '22-1121---1'"
             // クエリを準備する
-            if sqlite3_prepare(db, sql, -1, &stmt, nil) != SQLITE_OK{
+            guard sqlite3_prepare(db, query, -1, &stmt, nil) == SQLITE_OK else {
                 let errmsg = String(cString: sqlite3_errmsg(db)!)
                 print("error preparing insert: \(errmsg)")
+                return
             }
             // クエリを実行する
-            if sqlite3_step(stmt) != SQLITE_DONE {
+            guard sqlite3_step(stmt) == SQLITE_DONE else {
                 let errmsg = String(cString: sqlite3_errmsg(db)!)
                 print("failure inserting hero111: \(errmsg)")
-                sqlite3_finalize(stmt)
+                return
             }
-            
+            sqlite3_finalize(stmt)
     }
 
     

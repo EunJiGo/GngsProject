@@ -18,6 +18,7 @@ class EmployeeVO {
     var gender: Int = 0
     var position: String = ""
     var team: String = ""
+    var megazine: Int = 0
     var lastLogin: String = ""
     var registerDate: String = ""
     var changeDate: String = ""

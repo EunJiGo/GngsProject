@@ -16,19 +16,20 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
     let dbInfo = DBInfo()
     var positionList = [PositionVO()]
     var teamList = [TeamVO()]
+    var positionValue = PositionVO()
+    var teamValue = TeamVO()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         positionList = dbInfo.positionInfo()
         teamList = dbInfo.teamInfo()
-
-        let singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(MyTapMethod))
-        singleTapGestureRecognizer.numberOfTapsRequired = 1
-        singleTapGestureRecognizer.isEnabled = true
-        singleTapGestureRecognizer.cancelsTouchesInView = false
-        myScrollView.addGestureRecognizer(singleTapGestureRecognizer)
-
+        
+        tapScrollDown()
+        
+        nameKjTF.delegate = self
+        nameKtTF.delegate = self
+        nameEngTF.delegate = self
         firstTel.delegate = self
         secondTel.delegate = self
         lastTel.delegate = self
@@ -62,6 +63,7 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
         resDateTF.isEnabled = false
         resDateTF.textColor = .gray
         
+        pickerValueInit()
         createPickerView()
         
         addKeyboardNotifications()
@@ -106,43 +108,9 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
         }
     }
 
-    
-    @IBAction func positionPick(_ sender: Any) {
-        let positionIndexValue = position.firstIndex(of: positionTF.text!)!
-        pickerView1.selectRow(positionIndexValue, inComponent: 0, animated: false)
-    }
-  
-
-    @IBAction func teamPick(_ sender: Any) {
-        let teamIndexValue = team.firstIndex(of: teamTF.text!)!
-        pickerView2.selectRow(teamIndexValue, inComponent: 0, animated: false)
-    }
-    
-    var positionPart = [String]()
-    func positionPartList() -> [String] {
-        for i in 0...positionList.count-1{
-            let value: PositionVO = positionList[i]
-            positionPart.append(value.positionName)
-        }
-        return positionPart
-    }
-    
-    var teamPart = [String]()
-    func teamPartList() -> [String] {
-        for i in 0...teamList.count-1{
-            let value: TeamVO = teamList[i]
-            teamPart.append(value.teamName)
-        }
-        return teamPart
-    }
-    
-    var position: [String] = []
-    var team: [String] = []
-    var pickerView1 = UIPickerView()
+    let pickerView1 = UIPickerView()
     let pickerView2 = UIPickerView()
     func createPickerView() {
-        position = positionPartList()
-        team = teamPartList()
         pickerView1.delegate = self
         pickerView1.dataSource = self
         positionTF.tintColor = .clear
@@ -152,61 +120,89 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
     
         let toolBar = UIToolbar()
         toolBar.sizeToFit()
-        
         let btnDone = UIBarButtonItem(title: "決定", style: .done, target: self, action: #selector(onPickDone))
         let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         let btnCancel = UIBarButtonItem(title: "キャンサル", style: .done, target: self, action: #selector(onPickCancel))
         toolBar.setItems([btnCancel , space , btnDone], animated: true)
         toolBar.isUserInteractionEnabled = true
-              
         positionTF.inputView = pickerView1
         teamTF.inputView = pickerView2
         positionTF.inputAccessoryView = toolBar
         teamTF.inputAccessoryView = toolBar
     }
-    
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         if pickerView == pickerView1{
-            return position.count
+            return positionList.count
         }
         else{
-            return team.count
+            return teamList.count
         }
     }
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         if pickerView == pickerView1{
-            return position[row]
+            return positionList[row].positionName
         }
         else{
-            return team[row]
-        }
-    }
-    var positionValue: String = ""
-    var teamValue: String = ""
-    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        if pickerView == pickerView1{
-            positionValue = position[row]
-            teamValue = self.teamTF.text!
-        }
-        else{
-            positionValue = self.positionTF.text!
-            teamValue = team[row]
+            return teamList[row].teamName
         }
     }
     
-   
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        if pickerView == pickerView1{
+            positionValue = positionList[row]
+            self.positionTF.text = positionValue.positionName
+            teamValue.teamName = self.teamTF.text!
+        }
+        else{
+            teamValue = teamList[row]
+            self.teamTF.text = teamValue.teamName
+            positionValue.positionName = self.positionTF.text!
+        }
+    }
     @objc func onPickDone() {
-        positionTF.text = positionValue
+        positionTF.text = positionValue.positionName
         positionTF.resignFirstResponder()
-        teamTF.text = teamValue
+        teamTF.text = teamValue.teamName
         teamTF.resignFirstResponder()
     }
     @objc func onPickCancel() {
         positionTF.resignFirstResponder()
         teamTF.resignFirstResponder()
+    }
+    @IBAction func positionPick(_ sender: Any) {
+        for i in 0...positionList.count-1{
+            var position = positionList[i].positionName
+            if position == positionTF.text {
+                pickerView1.selectRow(i, inComponent: 0, animated: false)
+            }
+        }
+    }
+    func pickerValueInit() {
+        for i in 0...positionList.count-1{
+            var position = positionList[i].positionName
+            if position == self.positionTF.text {
+                positionValue = positionList[i]
+            }
+        }
+        for i in 0...teamList.count-1{
+            var team = teamList[i].teamName
+            if team == teamTF.text {
+                teamValue = teamList[i]
+            }
+        }
+    
+    }
+  
+    @IBAction func teamPick(_ sender: Any) {
+        for i in 0...teamList.count-1{
+            var team = teamList[i].teamName
+            if team == teamTF.text {
+                pickerView2.selectRow(i, inComponent: 0, animated: false)
+            }
+        }
     }
     
     @IBAction func backBtn(_ sender: Any) {
@@ -226,6 +222,13 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
         let date = "\(arr[8])\(arr[9])"
         let registerDate = "\(year)年\(month)月\(date)日"
         return registerDate
+    }
+    
+    func lastLoginUpdate() -> String{
+        var formatter = DateFormatter()
+        formatter.dateFormat = "yyyy/MM/dd HH:mm:ss"
+        var current_date_string = formatter.string(from: Date())
+        return current_date_string
     }
     
     var firstNum: String = ""
@@ -303,7 +306,7 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
             alertMessage.wrongCaseAlert(title: "", message: "電話番号を入力してください", target: self)
             return
         }
-        dbInfo.update(nameKj: kanji, nameKn: kata, nameEng: eng, tel: "\(firTel)-\(secTel)-\(lastTel)", position: self.positionTF.text!, team: self.teamTF.text!, megazine: self.megazineValue, memo: self.memoTV.text, empNum: self.empNumTF.text!)
+        dbInfo.update(nameKj: kanji, nameKn: kata, nameEng: eng, tel: "\(firTel)-\(secTel)-\(lastTel)", position: positionValue.positionCode, team: teamValue.teamCode, megazine: self.megazineValue, memo: self.memoTV.text, changeDate: lastLoginUpdate(), empNum: self.empNumTF.text!)
         let uvc = self.storyboard!.instantiateViewController(withIdentifier: "ListVC")
         uvc.modalTransitionStyle = UIModalTransitionStyle.coverVertical
         uvc.modalPresentationStyle = .fullScreen
@@ -321,10 +324,18 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification , object: nil)
     }
     
+    func tapScrollDown() {
+        let singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(MyTapMethod))
+        singleTapGestureRecognizer.numberOfTapsRequired = 1
+        singleTapGestureRecognizer.isEnabled = true
+        singleTapGestureRecognizer.cancelsTouchesInView = false
+        myScrollView.addGestureRecognizer(singleTapGestureRecognizer)
+    }
     @objc func MyTapMethod(sender: UITapGestureRecognizer) {
             self.myScrollView.endEditing(true)
         }
-    //ダメ。。 왜 안돼..
+    
+    //ダメ。。
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView){
             self.myScrollView.endEditing(true)
     }
@@ -350,7 +361,7 @@ class UpdateViewController: UIViewController, UITextFieldDelegate, UIPickerViewD
         let keyboardFrame = (userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as! NSValue).cgRectValue.height
         self.myScrollView.contentSize = CGSize(
             width: self.myScrollView.frame.width,
-            height: 1280
+            height: 1250
         )
         
         if self.memoTV.isFirstResponder {
